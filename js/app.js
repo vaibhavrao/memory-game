@@ -1,38 +1,210 @@
-/*
- * Create a list that holds all of your cards
- */
+// An array that holds all the symbols
+const cardSymList = [
+  'fa-diamond',
+  'fa-paper-plane-o',
+  'fa-anchor',
+  'fa-bolt',
+  'fa-cube',
+  'fa-leaf',
+  'fa-bicycle',
+  'fa-bomb',
+  'fa-diamond',
+  'fa-paper-plane-o',
+  'fa-anchor',
+  'fa-bolt',
+  'fa-cube',
+  'fa-leaf',
+  'fa-bicycle',
+  'fa-bomb',
+];
 
+// Number of moves done so far
+let movesCount = 0;
+
+// Number of cards that are yet to be matched
+let remainingCards = 16;
+
+// Style of the Odd card (first card in a pair) that has been revealed/flipped (open)
+let previouslyOpenCardStyle = '';
+
+// Style of the card that has just been opened (revealed/flipped)
+let currentlyOpenCard = '';
+
+// Add Listener on Page Load as to when DOM is ready - setup the cards
+document.addEventListener('DOMContentLoaded', refreshCardLayout);
 
 /*
  * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
  */
+function refreshCardLayout() {
+  // shuffle the list of cards
+  const newSymArray = shuffle(cardSymList);
+  let innerHTML = '';
+  // loop through each card and create its HTML
+  newSymArray.forEach(styleName => {
+    const cardHtml = createCardItem(styleName);
+    innerHTML = innerHTML.concat(cardHtml);
+  });
+  // add each card's HTML to the page
+  const deck = document.querySelector('.deck');
+  deck.innerHTML = innerHTML;
+  // clear all values
+  movesCount = 0;
+  remainingCards = 16;
+  clearOpenCardStyles();
+  updateStars();
+  updateNumMoves();
+}
+
+// Number of Moves
+function getMovesCount() {
+  return movesCount;
+}
+
+// Evaluate on Even moves - check for similarity between the two flipped cards
+function oddMove() {
+  return (movesCount % 2 !== 0);
+}
+
+// Resets comparison parameters
+function clearOpenCardStyles() {
+  previouslyOpenCardStyle = '';
+  currentlyOpenCard = '';
+}
+
+// Provides HTML for a Hidden card using specified style
+function createCardItem(styleName) {
+  return `<li class="card"><i class="fa ${styleName}"></i></li>`;
+}
+
+// Provides HTML for an Open/Flipped card using specified style
+function openCardItem(styleName) {
+  return `<li class="card show><i class="fa ${styleName}"></i></li>`;
+}
+
+// Provides HTML for Stars indicating the Number of Moves
+function createMoveCountItem() {
+  return '<li><i class="fa fa-star"></i></li>';
+}
 
 // Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
-
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
+  var currentIndex = array.length, temporaryValue, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
 }
 
 
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
+function setPreviousCardStyleMatch() {
+  const cards = document.getElementsByClassName('card show');
+  cards[0].classList.value = 'card match';
+}
+
+function setPreviousCardStyleHide() {
+  const cards = document.getElementsByClassName('card show');
+  cards[0].classList.value = 'card';
+}
+
+function setCurrentCardStyleMatch(eventTarget) {
+  if (eventTarget) {
+    eventTarget.classList.value = 'card match';
+  }
+}
+
+function setCurrentCardStyleShow(eventTarget) {
+  if (eventTarget) {
+    eventTarget.classList.value = 'card show';
+  }
+}
+
+function setCurrentCardStyleHide(eventTarget) {
+  if (eventTarget) {
+    eventTarget.classList.value = 'card';
+  }
+}
+
+function compareCards(eventTarget) {
+  // Compare to see if the 2 flipped cards are similar on EVEN moves
+  if (previouslyOpenCardStyle === currentlyOpenCard) {
+    // Cards matched
+    setCurrentCardStyleMatch(eventTarget);
+    setPreviousCardStyleMatch();
+    clearOpenCardStyles();
+    remainingCards -= 2;
+    if (remainingCards === 0) {
+      showGameOverMessage();
+    }
+  } else {
+    // Cards did not match
+    setCurrentCardStyleHide(eventTarget);
+    setPreviousCardStyleHide();
+    clearOpenCardStyles();
+  }
+}
+
+function showGameOverMessage() {
+  setTimeout(() => {
+    alert('Thank you for playing the Memory Game! You completed the game in ' + movesCount + ' moves');
+  }, 500);
+}
+
+// Update the Stars indicating Number of Moves
+function updateStars() {
+  let innerHTML = '';
+  for(let i =0; i < movesCount; i++) {
+    const countHtml = createMoveCountItem();
+    innerHTML = innerHTML.concat(countHtml);
+  }
+  const stars = document.querySelector('.stars');
+  stars.innerHTML = innerHTML;
+}
+
+// Update the Text indicating the Number of Moves
+function updateNumMoves() {
+  const numMoves = document.querySelector('.moves');
+  numMoves.innerHTML = movesCount === 1 ? movesCount.toString().concat(' Move') : movesCount.toString().concat(' Moves');
+}
+
+/**
+ * Card Click Handler
+ * @param {MouseEvent} event
  */
+function cardClicked(event) {
+  const eventTarget = event.target;
+
+  // Logic to prevent UI bug due to clicking space between cards
+  if (event.target.outerHTML.indexOf('<li') > 0) {
+    return;
+  }
+
+  // Update Move count
+  movesCount++;
+  
+  // Update Stars
+  updateStars();
+
+  // Update Number of Moves
+  updateNumMoves();
+
+  // Update style to reveal card
+  setCurrentCardStyleShow(eventTarget);
+
+  // Find out the clicked card's style and compare (if Even move)
+  const styleNameStartIndex = eventTarget.innerHTML.indexOf('fa-');
+  const styleNameEndIndex = eventTarget.innerHTML.indexOf('"></i>');
+  currentlyOpenCard = styleNameStartIndex !== -1 ?
+    eventTarget.innerHTML.substring(styleNameStartIndex, styleNameEndIndex) : '';
+  if (oddMove()) {
+    previouslyOpenCardStyle = currentlyOpenCard;
+  } else {
+    setTimeout(() => {
+      compareCards(eventTarget);
+    }, 250);
+  }
+}
