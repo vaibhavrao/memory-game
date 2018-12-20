@@ -21,6 +21,9 @@ const cardSymList = [
 // Number of moves done so far
 let movesCount = 0;
 
+// Indicator of awesomeness of a player's performance
+let starCount = 5;
+
 // Number of cards that are yet to be matched
 let remainingCards = 16;
 
@@ -50,6 +53,7 @@ function refreshCardLayout() {
   deck.innerHTML = innerHTML;
   // clear all values
   movesCount = 0;
+  starCount = 5;
   remainingCards = 16;
   clearOpenCardStyles();
   updateStars();
@@ -157,7 +161,18 @@ function showGameOverMessage() {
 // Update the Stars indicating Number of Moves
 function updateStars() {
   let innerHTML = '';
-  for(let i =0; i < movesCount; i++) {
+  if (movesCount > 16 && movesCount <= 26) {
+    starCount = 4;
+  } else if (movesCount > 26 && movesCount <= 38) {
+    starCount = 3;
+  } else if (movesCount > 38 && movesCount <= 52) {
+    starCount = 2;
+  } else if (movesCount > 52) {
+    starCount = 1;
+  } else {
+    starCount = 5;
+  }
+  for(let i =0; i < starCount; i++) {
     const countHtml = createMoveCountItem();
     innerHTML = innerHTML.concat(countHtml);
   }
@@ -180,6 +195,10 @@ function cardClicked(event) {
 
   // Logic to prevent UI bug due to clicking space between cards
   if (event.target.outerHTML.indexOf('<li') > 0) {
+    return;
+  }
+
+  if (remainingCards === 0) {
     return;
   }
 
