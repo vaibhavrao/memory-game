@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matching Game</title>
   <meta name="description" content="">
   <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
@@ -26,9 +27,18 @@
       <div class="restart">
         <i class="fa fa-repeat" onclick={refreshCardLayout()}></i>
       </div>
+
+      <span class="timer">0:00</span>
     </section>
 
     <ul class="deck" onclick="{cardClicked(event)}" />
+  </div>
+  <div class="gameOver">
+    <header>
+      <h1>Congratulations, You Won!</h1>
+    </header>
+    <section class="gameSummary">
+    </section>
   </div>
 </body>
 

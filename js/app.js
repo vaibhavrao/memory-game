@@ -21,6 +21,12 @@ const cardSymList = [
 // Number of moves done so far
 let movesCount = 0;
 
+// Time elapsed since game started
+let timeElapsed = 0;
+
+// Is Timer currently running
+let timerActive = false;
+
 // Indicator of awesomeness of a player's performance
 let starCount = 5;
 
@@ -51,10 +57,18 @@ function refreshCardLayout() {
   // add each card's HTML to the page
   const deck = document.querySelector('.deck');
   deck.innerHTML = innerHTML;
+  // change visibility of views
+  const container = document.querySelector('.container');
+  const gameOver = document.querySelector('.gameOver');
+  container.style.display = 'flex';
+  gameOver.style.display = 'none';
   // clear all values
   movesCount = 0;
   starCount = 5;
   remainingCards = 16;
+  timeElapsed = 0;
+  const timeDisplay = document.querySelector('.timer');
+  timeDisplay.innerHTML = '0:00';
   clearOpenCardStyles();
   updateStars();
   updateNumMoves();
@@ -141,7 +155,7 @@ function compareCards(eventTarget) {
     setPreviousCardStyleMatch();
     clearOpenCardStyles();
     remainingCards -= 2;
-    if (remainingCards === 0) {
+    if (!remainingCards) {
       showGameOverMessage();
     }
   } else {
@@ -153,9 +167,43 @@ function compareCards(eventTarget) {
 }
 
 function showGameOverMessage() {
+  stopTimer();
+  const gameSummary = document.querySelector('.gameSummary');
+  gameSummary.innerHTML = 
+    '<p>Thank you for playing the Memory Game!</p><p>You completed the game in <em>' + movesCount + '</em> moves with <em>' + starCount + '</em> stars</p><p> <button type="button" class="playAgain" onclick="refreshCardLayout()">Play again!</button></p>';
+  // Handles to game view and summaryView
+  const container = document.querySelector('.container');
+  const gameOver = document.querySelector('.gameOver');
+  container.style.display = 'none';
+  gameOver.style.display = 'block';
+}
+
+// Start Timer
+function startTimer() {
+  timeElapsed = 0;
+  timerActive = true;
+  updateTimer();
+}
+
+// Update Timer
+function updateTimer() {
   setTimeout(() => {
-    alert('Thank you for playing the Memory Game! You completed the game in ' + movesCount + ' moves');
-  }, 500);
+    if (timerActive) {
+      timeElapsed++;
+      const minutes = Math.floor(timeElapsed / 60);
+      const sec = timeElapsed % 60;
+      const seconds = sec < 10 ? '0'.concat(sec.toString()) : sec.toString();
+      const formattedTime = minutes.toString().concat(':', seconds);
+      const timeDisplay = document.querySelector('.timer');
+      timeDisplay.innerHTML = formattedTime;
+      updateTimer();
+    }
+  }, 1000);
+}
+
+// Stop Timer
+function stopTimer() {
+  timerActive = false;
 }
 
 // Update the Stars indicating Number of Moves
@@ -193,13 +241,23 @@ function updateNumMoves() {
 function cardClicked(event) {
   const eventTarget = event.target;
 
-  // Logic to prevent UI bug due to clicking space between cards
+  // Ignore clicks in space between cards
   if (event.target.outerHTML.indexOf('<li') > 0) {
     return;
   }
 
-  if (remainingCards === 0) {
+  // Ignore clicks on Done cards
+  if (event.target.outerHTML.indexOf('card match') > 0) {
     return;
+  }
+
+  if (!remainingCards) {
+    return;
+  }
+
+  // Start timer
+  if (!movesCount) {
+    startTimer();
   }
 
   // Update Move count
