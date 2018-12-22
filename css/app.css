@@ -81,13 +81,16 @@ h1 {
   box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
 }
 
-.deck .card.open {
+.deck .card.show {
+  font-size: 33px;
   transform: rotateY(0);
   background: #02b3e4;
   cursor: default;
 }
 
-.deck .card.show {
+.deck .card.mismatch {
+  cursor: default;
+  background: #ffa500;
   font-size: 33px;
 }
 

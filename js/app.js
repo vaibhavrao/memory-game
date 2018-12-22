@@ -67,6 +67,7 @@ function refreshCardLayout() {
   starCount = 5;
   remainingCards = 16;
   timeElapsed = 0;
+  timerActive = false;
   const timeDisplay = document.querySelector('.timer');
   timeDisplay.innerHTML = '0:00';
   clearOpenCardStyles();
@@ -118,32 +119,15 @@ function shuffle(array) {
   return array;
 }
 
-
-function setPreviousCardStyleMatch() {
-  const cards = document.getElementsByClassName('card show');
-  cards[0].classList.value = 'card match';
+function setPreviousCardStyle(prevStyle, newStyle) {
+  const cards = document.getElementsByClassName(`card ${prevStyle}`);
+  cards[0].classList.value = newStyle ? `card ${newStyle}` : 'card';
 }
 
-function setPreviousCardStyleHide() {
-  const cards = document.getElementsByClassName('card show');
-  cards[0].classList.value = 'card';
-}
-
-function setCurrentCardStyleMatch(eventTarget) {
+// set style for Current Card using EventTarget reference
+function setCurrentCardStyle(eventTarget, newStyle) {
   if (eventTarget) {
-    eventTarget.classList.value = 'card match';
-  }
-}
-
-function setCurrentCardStyleShow(eventTarget) {
-  if (eventTarget) {
-    eventTarget.classList.value = 'card show';
-  }
-}
-
-function setCurrentCardStyleHide(eventTarget) {
-  if (eventTarget) {
-    eventTarget.classList.value = 'card';
+    eventTarget.classList.value = newStyle === 'hide' ? 'card' : 'card '.concat(newStyle);
   }
 }
 
@@ -151,8 +135,8 @@ function compareCards(eventTarget) {
   // Compare to see if the 2 flipped cards are similar on EVEN moves
   if (previouslyOpenCardStyle === currentlyOpenCard) {
     // Cards matched
-    setCurrentCardStyleMatch(eventTarget);
-    setPreviousCardStyleMatch();
+    setCurrentCardStyle(eventTarget, 'match');
+    setPreviousCardStyle('show', 'match');
     clearOpenCardStyles();
     remainingCards -= 2;
     if (!remainingCards) {
@@ -160,9 +144,13 @@ function compareCards(eventTarget) {
     }
   } else {
     // Cards did not match
-    setCurrentCardStyleHide(eventTarget);
-    setPreviousCardStyleHide();
-    clearOpenCardStyles();
+    setCurrentCardStyle(eventTarget, 'mismatch');
+    setPreviousCardStyle('show', 'mismatch');
+    setTimeout(() => {
+      setCurrentCardStyle(eventTarget, 'hide');
+      setPreviousCardStyle('mismatch', '');
+      clearOpenCardStyles();
+    }, 500);
   }
 }
 
@@ -270,7 +258,7 @@ function cardClicked(event) {
   updateNumMoves();
 
   // Update style to reveal card
-  setCurrentCardStyleShow(eventTarget);
+  setCurrentCardStyle(eventTarget, 'show');
 
   // Find out the clicked card's style and compare (if Even move)
   const styleNameStartIndex = eventTarget.innerHTML.indexOf('fa-');
