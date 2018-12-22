@@ -42,8 +42,8 @@ let currentlyOpenCard = '';
 // Add Listener on Page Load as to when DOM is ready - setup the cards
 document.addEventListener('DOMContentLoaded', refreshCardLayout);
 
-/*
- * Display the cards on the page
+/**
+ * @description Display the cards on the page
  */
 function refreshCardLayout() {
   // shuffle the list of cards
@@ -75,38 +75,46 @@ function refreshCardLayout() {
   updateNumMoves();
 }
 
-// Number of Moves
-function getMovesCount() {
-  return movesCount;
-}
-
-// Evaluate on Even moves - check for similarity between the two flipped cards
-function oddMove() {
+/**
+ * @description Evaluate on Even moves - check for similarity between the two flipped cards
+ */
+function isOddMove() {
   return (movesCount % 2 !== 0);
 }
 
-// Resets comparison parameters
+/**
+ * @description Resets comparison parameters
+ */
 function clearOpenCardStyles() {
   previouslyOpenCardStyle = '';
   currentlyOpenCard = '';
 }
 
-// Provides HTML for a Hidden card using specified style
+/**
+ * @description Provides HTML for a Hidden card using specified style
+ */
 function createCardItem(styleName) {
   return `<li class="card"><i class="fa ${styleName}"></i></li>`;
 }
 
-// Provides HTML for an Open/Flipped card using specified style
+/**
+ * @description Provides HTML for an Open/Flipped card using specified style
+ */
 function openCardItem(styleName) {
   return `<li class="card show><i class="fa ${styleName}"></i></li>`;
 }
 
-// Provides HTML for Stars indicating the Number of Moves
+/**
+ * @description Provides HTML for Stars indicating the Number of Moves
+ */
 function createMoveCountItem() {
   return '<li><i class="fa fa-star"></i></li>';
 }
 
-// Shuffle function from http://stackoverflow.com/a/2450976
+/**
+ * @description Shuffle function from http://stackoverflow.com/a/2450976
+ * @param {array} array - array containing stock symbols
+ */
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
   while (currentIndex !== 0) {
@@ -119,18 +127,27 @@ function shuffle(array) {
   return array;
 }
 
+/**
+ * @description Set style for Previous Card
+ */
 function setPreviousCardStyle(prevStyle, newStyle) {
   const cards = document.getElementsByClassName(`card ${prevStyle}`);
   cards[0].classList.value = newStyle ? `card ${newStyle}` : 'card';
 }
 
-// set style for Current Card using EventTarget reference
+/**
+ * @description Set style for Current Card using EventTarget reference
+ */
 function setCurrentCardStyle(eventTarget, newStyle) {
   if (eventTarget) {
     eventTarget.classList.value = newStyle === 'hide' ? 'card' : 'card '.concat(newStyle);
   }
 }
 
+/**
+ * @description Compare the 2 open cards
+ * @param {object} eventTarget - eventTarget obtained from MouseEvent
+ */
 function compareCards(eventTarget) {
   // Compare to see if the 2 flipped cards are similar on EVEN moves
   if (previouslyOpenCardStyle === currentlyOpenCard) {
@@ -154,6 +171,9 @@ function compareCards(eventTarget) {
   }
 }
 
+/**
+ * @description Show Game summary upon game completion
+ */
 function showGameOverMessage() {
   stopTimer();
   const gameSummary = document.querySelector('.gameSummary');
@@ -166,14 +186,18 @@ function showGameOverMessage() {
   gameOver.style.display = 'block';
 }
 
-// Start Timer
+/**
+ * @description Start Timer
+ */
 function startTimer() {
   timeElapsed = 0;
   timerActive = true;
   updateTimer();
 }
 
-// Update Timer
+/**
+ * @description Update Timer
+ */
 function updateTimer() {
   setTimeout(() => {
     if (timerActive) {
@@ -189,12 +213,16 @@ function updateTimer() {
   }, 1000);
 }
 
-// Stop Timer
+/**
+ * @description Stop Timer
+ */
 function stopTimer() {
   timerActive = false;
 }
 
-// Update the Stars indicating Number of Moves
+/**
+ * @description Update the Stars indicating Number of Moves
+ */
 function updateStars() {
   let innerHTML = '';
   if (movesCount > 16 && movesCount <= 26) {
@@ -216,7 +244,9 @@ function updateStars() {
   stars.innerHTML = innerHTML;
 }
 
-// Update the Text indicating the Number of Moves
+/**
+ * @description Update the Text indicating the Number of Moves
+ */
 function updateNumMoves() {
   const numMoves = document.querySelector('.moves');
   numMoves.innerHTML = movesCount === 1 ? movesCount.toString().concat(' Move') : movesCount.toString().concat(' Moves');
@@ -224,7 +254,7 @@ function updateNumMoves() {
 
 /**
  * Card Click Handler
- * @param {MouseEvent} event
+ * @param {object} event - MouseEvent
  */
 function cardClicked(event) {
   const eventTarget = event.target;
@@ -265,7 +295,7 @@ function cardClicked(event) {
   const styleNameEndIndex = eventTarget.innerHTML.indexOf('"></i>');
   currentlyOpenCard = styleNameStartIndex !== -1 ?
     eventTarget.innerHTML.substring(styleNameStartIndex, styleNameEndIndex) : '';
-  if (oddMove()) {
+  if (isOddMove()) {
     previouslyOpenCardStyle = currentlyOpenCard;
   } else {
     setTimeout(() => {
