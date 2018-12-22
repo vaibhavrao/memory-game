@@ -76,13 +76,6 @@ function refreshCardLayout() {
 }
 
 /**
- * @description Evaluate on Even moves - check for similarity between the two flipped cards
- */
-function isOddMove() {
-  return (movesCount % 2 !== 0);
-}
-
-/**
  * @description Resets comparison parameters
  */
 function clearOpenCardStyles() {
@@ -116,7 +109,7 @@ function createMoveCountItem() {
  * @param {array} array - array containing stock symbols
  */
 function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+  let currentIndex = array.length, temporaryValue, randomIndex;
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -132,7 +125,9 @@ function shuffle(array) {
  */
 function setPreviousCardStyle(prevStyle, newStyle) {
   const cards = document.getElementsByClassName(`card ${prevStyle}`);
-  cards[0].classList.value = newStyle ? `card ${newStyle}` : 'card';
+  if (cards[0]) {
+    cards[0].classList.value = newStyle ? `card ${newStyle}` : 'card';
+  }
 }
 
 /**
@@ -225,13 +220,13 @@ function stopTimer() {
  */
 function updateStars() {
   let innerHTML = '';
-  if (movesCount > 16 && movesCount <= 26) {
+  if (movesCount > 10 && movesCount <= 18) {
     starCount = 4;
-  } else if (movesCount > 26 && movesCount <= 38) {
+  } else if (movesCount > 18 && movesCount <= 26) {
     starCount = 3;
-  } else if (movesCount > 38 && movesCount <= 52) {
+  } else if (movesCount > 26 && movesCount <= 34) {
     starCount = 2;
-  } else if (movesCount > 52) {
+  } else if (movesCount > 34) {
     starCount = 1;
   } else {
     starCount = 5;
@@ -278,15 +273,6 @@ function cardClicked(event) {
     startTimer();
   }
 
-  // Update Move count
-  movesCount++;
-  
-  // Update Stars
-  updateStars();
-
-  // Update Number of Moves
-  updateNumMoves();
-
   // Update style to reveal card
   setCurrentCardStyle(eventTarget, 'show');
 
@@ -295,9 +281,15 @@ function cardClicked(event) {
   const styleNameEndIndex = eventTarget.innerHTML.indexOf('"></i>');
   currentlyOpenCard = styleNameStartIndex !== -1 ?
     eventTarget.innerHTML.substring(styleNameStartIndex, styleNameEndIndex) : '';
-  if (isOddMove()) {
+  if (!previouslyOpenCardStyle) {
     previouslyOpenCardStyle = currentlyOpenCard;
   } else {
+    // Update Move count
+    movesCount++;
+    // Update Stars
+    updateStars();
+    // Update Number of Moves
+    updateNumMoves();
     setTimeout(() => {
       compareCards(eventTarget);
     }, 250);
