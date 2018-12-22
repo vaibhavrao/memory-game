@@ -163,10 +163,10 @@ function compareCards(eventTarget) {
     // Cards did not match
     setCurrentCardStyle(eventTarget, 'mismatch');
     setPreviousCardStyle('show', 'mismatch');
+    clearOpenCardStyles();
     setTimeout(() => {
       setCurrentCardStyle(eventTarget, 'hide');
       setPreviousCardStyle('mismatch', '');
-      clearOpenCardStyles();
     }, 500);
   }
 }
