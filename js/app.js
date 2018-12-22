@@ -178,7 +178,7 @@ function showGameOverMessage() {
   stopTimer();
   const gameSummary = document.querySelector('.gameSummary');
   gameSummary.innerHTML = 
-    '<p>Thank you for playing the Memory Game!</p><p>You completed the game in <em>' + movesCount + '</em> moves with <em>' + starCount + '</em> stars</p><p> <button type="button" class="playAgain" onclick="refreshCardLayout()">Play again!</button></p>';
+    '<p>Thank you for playing the Memory Game!</p><p>You completed the game in ' + movesCount + ' moves with ' + starCount + ' stars</p><p> <button type="button" class="playAgain" onclick="refreshCardLayout()">Play again!</button></p>';
   // Handles to game view and summaryView
   const container = document.querySelector('.container');
   const gameOver = document.querySelector('.gameOver');
