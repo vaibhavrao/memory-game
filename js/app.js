@@ -18,6 +18,17 @@ const cardSymList = [
   'fa-bomb',
 ];
 
+/**
+ * @description Shuffle function
+ */
+const shuffle = () => {
+  let array = [];
+  cardSymList.map(symbol => {
+    array[getRandomIndex(array)] = symbol;
+  });
+  return array;
+}
+
 // Number of moves done so far
 let movesCount = 0;
 
@@ -47,7 +58,7 @@ document.addEventListener('DOMContentLoaded', refreshCardLayout);
  */
 function refreshCardLayout() {
   // shuffle the list of cards
-  const newSymArray = shuffle(cardSymList);
+  const newSymArray = shuffle();
   let innerHTML = '';
   // loop through each card and create its HTML
   newSymArray.forEach(styleName => {
@@ -105,19 +116,18 @@ function createMoveCountItem() {
 }
 
 /**
- * @description Shuffle function from http://stackoverflow.com/a/2450976
- * @param {array} array - array containing stock symbols
+ * Generates unique random integers between the range specified by min & max
+ * @param {array} array - Array for which we need to find random indices
  */
-function shuffle(array) {
-  let currentIndex = array.length, temporaryValue, randomIndex;
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
+function getRandomIndex(array) {
+  const min = 0;
+  const max = 15;
+  const index = Math.floor(Math.random() * (max - min + 1)) + min;
+  if (array[index]) {
+    // Avoid duplicates
+    return getRandomIndex(array);
   }
-  return array;
+  return index;
 }
 
 /**
